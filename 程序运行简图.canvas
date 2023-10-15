@@ -1,0 +1,21 @@
+{
+	"nodes":[
+		{"id":"9c8a775e7f7ff442","x":-740,"y":-560,"width":1030,"height":399,"type":"group","label":"界面"},
+		{"id":"ca08a42b43fcf744","type":"text","text":"开始界面（菜单）","x":-407,"y":-442,"width":250,"height":60},
+		{"id":"964292d2321afe36","type":"text","text":"介绍界面","x":-407,"y":-241,"width":250,"height":60},
+		{"id":"796e5f83947b4ce4","type":"text","text":"游戏界面","x":-720,"y":-241,"width":250,"height":60},
+		{"id":"36c2bbcc0f5607cb","type":"text","text":"设置界面","x":-95,"y":-241,"width":250,"height":60},
+		{"id":"4981cda99e40c59e","type":"text","text":"退出游戏","x":20,"y":-540,"width":250,"height":60},
+		{"id":"cbf8ebdc7a9eea7d","type":"text","text":"开始游戏","x":-494,"y":53,"width":250,"height":60},
+		{"id":"3e9ed7d49ba93a35","type":"text","text":"初始化界面+倒计时","x":-494,"y":200,"width":250,"height":60}
+	],
+	"edges":[
+		{"id":"50ee13d8e4f6300f","fromNode":"ca08a42b43fcf744","fromSide":"bottom","toNode":"796e5f83947b4ce4","toSide":"top","label":"菜单选项"},
+		{"id":"836331b3cbfc860e","fromNode":"ca08a42b43fcf744","fromSide":"bottom","toNode":"964292d2321afe36","toSide":"top","label":"菜单选项"},
+		{"id":"13742c3d41e878ff","fromNode":"ca08a42b43fcf744","fromSide":"bottom","toNode":"36c2bbcc0f5607cb","toSide":"top","label":"菜单选项"},
+		{"id":"b15c9cc9e521c998","fromNode":"ca08a42b43fcf744","fromSide":"top","toNode":"4981cda99e40c59e","toSide":"left","label":"菜单选项"},
+		{"id":"310753dc36ffb09e","fromNode":"796e5f83947b4ce4","fromSide":"right","toNode":"964292d2321afe36","toSide":"left","fromEnd":"arrow"},
+		{"id":"c51a16af3df847fa","fromNode":"36c2bbcc0f5607cb","fromSide":"bottom","toNode":"796e5f83947b4ce4","toSide":"bottom","fromEnd":"arrow"},
+		{"id":"a79b934f37f43a0b","fromNode":"cbf8ebdc7a9eea7d","fromSide":"bottom","toNode":"3e9ed7d49ba93a35","toSide":"top"}
+	]
+}
