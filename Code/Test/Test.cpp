@@ -1,6 +1,12 @@
 ﻿#include <graphics.h>
 #include <iostream>
+#include <winuser.h>
+
+#include <wchar.h>//Debug
+
 #include "resource.h"
+
+//#define DEBUG
 
 using namespace std;
 
@@ -13,8 +19,9 @@ int main()
 	ExMessage m;
 	IMAGE player;
 	POINT playerLocation = { windowX / 2, windowY / 2 };
+	char userLastInput=0;
 
-	initgraph(windowX, windowY);
+	initgraph(windowX, windowY, EX_SHOWCONSOLE);
 
 
 	loadimage(&player, L"PNG", MAKEINTRESOURCE(RESplayer));
@@ -30,56 +37,109 @@ int main()
 
 	while (true)
 	{
-		Sleep(17);
-		flushmessage(EX_MOUSE | EX_CHAR);
-		peekmessage(&m, EX_MOUSE | EX_KEY);
-
-		switch (m.message)
+		//flushmessage(EX_MOUSE | EX_CHAR);
+		//Input Process
+		while(peekmessage(&m, EX_MOUSE | EX_KEY))
 		{
-		case WM_MOUSEMOVE:
-			putpixel(m.x, m.y, RED);
-			break;
-
-		case WM_KEYDOWN:
-			switch (m.vkcode)
+			switch (m.message)
 			{
-			case 'W':
-				playerLocation.y -= 5;
+			case WM_MOUSEMOVE:
+				putpixel(m.x, m.y, RED);
 				break;
 
-			case 'S':
-				playerLocation.y += 5;
-				break;
+			case WM_KEYDOWN:
 
-			case 'A':
-				playerLocation.x -= 5;
-				break;
+#ifdef DEBUG
+				cout << "KEY_DOWN" << m.vkcode << "   " << GetKeyState(userLastInput);
+#endif // DEBUG
 
-			case 'D':
-				playerLocation.x += 5;
-				break;
+				//switch (m.vkcode)
+				//{
+				//case 'W':
+				//	userLastInput = 'W';
+				//	break;
 
-			case VK_ESCAPE:
-				closegraph();
-				return 0;
+				//case 'S':
+				//	userLastInput = 'S';
+				//	break;
+
+				//case 'A':
+				//	userLastInput = 'A';
+				//	break;
+
+				//case 'D':
+				//	userLastInput = 'D';
+				//	break;
+
+				//case VK_ESCAPE:
+				//	closegraph();
+				//	return 0;
+
+				//default:
+				//	break;
+				//}
+
+				if (m.vkcode == VK_ESCAPE)
+				{
+					closegraph();
+					return 0;
+				}
+				if (m.vkcode == 'W' || m.vkcode == 'S' || m.vkcode == 'A' || m.vkcode == 'D')
+					userLastInput = m.vkcode;
+
+			case WM_KEYUP:
+
+#ifdef DEBUG
+				cout << "KEY_UP" << m.vkcode << "   "<< GetKeyState(userLastInput);
+#endif // DEBUG
+
+				if (m.vkcode == userLastInput && ~(GetKeyState(userLastInput) >> 7 ))
+					userLastInput = 0;
+				break;
 
 			default:
 				break;
 			}
+#ifdef DEBUG
+			cout <<"               " << m.vkcode << " & " << userLastInput << endl;//Debug
+#endif // DEBUG
+		}
 
+		//Object Update
+		switch (userLastInput)
+		{
+		case 'W':
+			playerLocation.y -= 5;
+			break;
 
+		case 'S':
+			playerLocation.y += 5;
+			break;
+
+		case 'A':
+			playerLocation.x -= 5;
+			break;
+
+		case 'D':
+			playerLocation.x += 5;
+			break;
 
 		default:
 			break;
 		}
 
+#ifdef DEBUG
+		cout << "                              " << playerLocation.x << " & " << playerLocation.y << endl;//Debug
+#endif // DEBUG
 
-		cout << playerLocation.x << " & " << playerLocation.y << endl;
-
+		//Render
 		clearpolygon(windowPoint, 4);
 		putimage(playerLocation.x, playerLocation.y, &player);
 		FlushBatchDraw();
+		Sleep(17);
 	}
 
 	return 0;
 }
+
+
