@@ -1,0 +1,70 @@
+// 这个文件是废弃的
+
+#include <graphics.h>
+#include <iostream>
+#include <winuser.h>
+
+#include <wchar.h>//Debug
+
+//#include "resource.h"
+
+struct size
+{
+    int width;
+    int height;
+};
+
+int main()
+{
+	game sod;
+	sod.windowSize = { 1024,615 };
+	sod.init();
+	sod.loop();
+	sod.stop();
+
+	return 0;
+}
+
+
+class game
+{
+public:
+
+	size windowSize;
+
+	game();
+
+	bool init(int type = EX_SHOWCONSOLE);
+	void loop();
+	void stop();
+
+
+private:
+
+	void process();
+	void update();
+	void render();
+
+	bool isRunning;
+
+};
+
+bool game::init(int type = EX_SHOWCONSOLE)
+{
+	initgraph(game::windowsSize.width, windowsSize.height, type);
+}
+
+void game::loop()
+{
+	while (isRunning)
+	{
+		process();
+		update();
+		render();
+	}
+}
+
+void game::stop()
+{
+	closegraph();
+}
