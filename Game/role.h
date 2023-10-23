@@ -7,6 +7,14 @@ class role
 public:
 	role();
 	~role();
+	struct roleData
+	{
+		int attack; //attack
+		int magicAttack; //magic attack
+		int healthPoints; //health points
+		int recovery;
+		int speed;
+	};
 
 	void setLocation(POINT location);
 	LONG getLocation(char XorY);
