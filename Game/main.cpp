@@ -20,8 +20,9 @@ int main()
 
 #include "resource.h"
 #include "role.h"
+#include "board.h"
 
-//#define DEBUG
+//#define DEBUGG
 
 using namespace std;
 
@@ -39,18 +40,30 @@ int main()
 	initgraph(windowX, windowY, EX_SHOWCONSOLE);
 
 	role testRole;
+	board testBoard;
+
 
 	//loadimage(&player, L"PNG", MAKEINTRESOURCE(testRoleImg));
 	testRole.setRoleImg(L"PNG", MAKEINTRESOURCE(testRoleImg));
 	testRole.setLocation({ windowX / 2, windowY / 2 });
 
+	testBoard.setBoardLocation({ 0,0 });
+	testBoard.setBoardSize({ 5,5 });
+	testBoard.setGridSize({ 90,90 });
+
 	//IMPORTANT: must flush draw after every draw
 	BeginBatchDraw();
 
 	//player need to be encapsulated
-
+	//
 	//putimage(playerLocation.x, playerLocation.y, &player);
+	testBoard.render();
 	testRole.render();
+
+	LINESTYLE pstyle;
+	getlinestyle(&pstyle);
+	DWORD lineWidth = pstyle.thickness;
+	cout << lineWidth;
 
 	FlushBatchDraw();
 
@@ -128,19 +141,19 @@ int main()
 		switch (userLastInput)
 		{
 		case 'W':
-			testRole.shiftLocation('Y', -5);
+			testRole.shiftLocation({0,-5});
 			break;
 
 		case 'S':
-			testRole.shiftLocation('Y', 5);
+			testRole.shiftLocation({ 0,5 });
 			break;
 
 		case 'A':
-			testRole.shiftLocation('X', -5);
+			testRole.shiftLocation({ -5,0 });
 			break;
 
 		case 'D':
-			testRole.shiftLocation('X', 5);
+			testRole.shiftLocation({ 5,0});
 			break;
 
 		default:
@@ -154,6 +167,7 @@ int main()
 		//Render
 		clearpolygon(windowPoint, 4);
 		//putimage(testRole.roleLocation.x, testRole.roleLocation.y, &player);
+		testBoard.render(); 
 		testRole.render();
 		FlushBatchDraw();
 		Sleep(17);

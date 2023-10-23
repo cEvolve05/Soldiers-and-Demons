@@ -14,29 +14,31 @@ public:
 		int healthPoints; //health points
 		int recovery;
 		int speed;
-	};
+	}roleData;
 
 	void setLocation(POINT location);
 	LONG getLocation(char XorY);
-	void shiftLocation(char XorY, int shiftValue);
+	void shiftLocation(POINT shiftValue);
 	
-	// get img from resource
+		// get img from resource
 	void setRoleImg(LPCTSTR pResType, LPCTSTR pResName);
 
-	// show role in location
-	//type = 0: Normal, no alpha channel
-	//       1: Transparent, low prefermance TO-DO
+		// show role in location
+		//type = 0: Normal, no alpha channel
+		//       1: Transparent, low prefermance TO-DO
 	void render(int type=0);
 
 private:
-	// left-upper point
+		// left-top point
 	POINT roleLocation;
 	IMAGE roleImg;
 };
 
 role::role()
 {
-	this->roleLocation = { 0,0 };
+	this->roleLocation = { 0 };
+	this->roleData = { 0 };
+	this->roleImg = NULL;
 }
 
 role::~role()
@@ -61,17 +63,10 @@ inline LONG role::getLocation(char XorY)
 	return 0;
 }
 
-inline void role::shiftLocation(char XorY, int shiftValue)
+inline void role::shiftLocation(POINT shiftValue)
 {
-	switch (XorY)
-	{
-	case 'X':
-		roleLocation.x += shiftValue;
-		return;
-	case 'Y':
-		roleLocation.y += shiftValue;
-		return;
-	}
+	roleLocation.x += shiftValue.x;
+	roleLocation.y += shiftValue.y;
 	return;
 }
 

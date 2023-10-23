@@ -6,10 +6,10 @@
 
 #include "resource.h"
 
-//#define DEBUG
+#define DEBUG
 
 using namespace std;
-
+/*
 int main()
 {
 	const int windowX = 500;
@@ -140,6 +140,19 @@ int main()
 	}
 
 	return 0;
+}*/
+
+#include "board.h"
+int main()
+{
+	initgraph(500, 500);
+	board testBoard;
+	testBoard.setBoardLocation({ 0,0 });
+	testBoard.setBoardSize({ 5,5 });
+	testBoard.setGridSize({ 90,90 });
+	testBoard.render();
+
+	
+	getchar();
+	return 0;
 }
-
-

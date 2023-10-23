@@ -130,6 +130,7 @@
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="board.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
