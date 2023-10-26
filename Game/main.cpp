@@ -1,7 +1,7 @@
 #include <graphics.h>
 #include <iostream>
 
-#include "game.h"
+#include "include.h"
 
 //role solder;//TODO
 //role demon;

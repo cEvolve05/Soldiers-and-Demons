@@ -1,29 +1,72 @@
-#pragma once
-#include <graphics.h>
-#include "game.h"
-#include "activityManager.h"
-#include "object.h"
+#include "include.h"
 
-class activity
+activity* activityManager::currentActivity = NULL;
+bool game::running = 0;
+
+game::game()
 {
-public:
-	virtual void lifeCycle()=0;
-protected:
-	bool exitActivity;
-};
+	this->running = 1;
+}
 
-
-
-class MenuActivity final: public activity
+game::~game()
 {
-public:
-	MenuActivity();
-	~MenuActivity();
-	void lifeCycle() override;
+}
 
-private:
+bool game::getRunningStatus()
+{
+	return running;
+}
 
-};
+void game::setRunningStatus(bool status)
+{
+	running = status;
+	return;
+}
+
+void game::entry()
+{
+	init();
+	activityManager::showActivity();
+	end();
+	return;
+}
+
+void game::init()
+{
+	initgraph(500, 500, EX_SHOWCONSOLE);
+	activityManager::setActivity(new MenuActivity);
+	return;
+}
+
+void game::end()
+{
+	closegraph();
+	return;
+}
+
+
+activityManager::activityManager()
+{
+}
+
+activityManager::~activityManager()
+{
+}
+
+void activityManager::showActivity()
+{
+	while (game::getRunningStatus())
+	{
+		currentActivity->lifeCycle();
+	}
+	return;
+}
+
+void activityManager::setActivity(activity* a)
+{
+	currentActivity = a;
+	return;
+}
 
 MenuActivity::MenuActivity()
 {
@@ -33,7 +76,7 @@ MenuActivity::~MenuActivity()
 {
 }
 
-inline void MenuActivity::lifeCycle()
+void MenuActivity::lifeCycle()
 {
 	//code for Menu
 	while (game::getRunningStatus() && !exitActivity)
@@ -43,42 +86,20 @@ inline void MenuActivity::lifeCycle()
 	return;
 }
 
-class GamingActivity final : public activity
-{
-public:
-	GamingActivity();
-	~GamingActivity();
-	void lifeCycle() override;
-
-private:
-	ExMessage m;
-	char LuserLastInput, RuserLastInput;
-	bool LinputRequireProcess, RinputRequireProcess;
-
-	role L(,,),
-		R(,,);
-
-	void inputProcess();
-	void process();
-	void render();
-
-private:
-
-};
-
 GamingActivity::GamingActivity()
 {
 	LuserLastInput = 0;
 	RuserLastInput = 0;
 	LinputRequireProcess = 0;
 	RinputRequireProcess = 0;
+	m = { 0 };
 }
 
 GamingActivity::~GamingActivity()
 {
 }
 
-inline void GamingActivity::lifeCycle()
+void GamingActivity::lifeCycle()
 {
 	//loop inside
 	//code for Gaming
@@ -91,7 +112,7 @@ inline void GamingActivity::lifeCycle()
 	return;
 }
 
-inline void GamingActivity::inputProcess()
+void GamingActivity::inputProcess()
 {
 
 	//flushmessage(EX_MOUSE | EX_CHAR);
@@ -127,9 +148,10 @@ inline void GamingActivity::inputProcess()
 			break;
 		}
 	}
+	return;
 }
 
-inline void GamingActivity::process()
+void GamingActivity::process()
 {
 	if (LinputRequireProcess)
 	{
@@ -142,23 +164,14 @@ inline void GamingActivity::process()
 		//Process R role move, touch
 		RinputRequireProcess = false;
 	}
+	return;
 }
 
-inline void GamingActivity::render()
+void GamingActivity::render()
 {
 	//testRole.render();
+	return;
 }
-
-class RuleIntroActivity final : public activity
-{
-public:
-	RuleIntroActivity();
-	~RuleIntroActivity();
-	void lifeCycle() override;
-
-private:
-
-};
 
 RuleIntroActivity::RuleIntroActivity()
 {
@@ -168,7 +181,7 @@ RuleIntroActivity::~RuleIntroActivity()
 {
 }
 
-inline void RuleIntroActivity::lifeCycle()
+void RuleIntroActivity::lifeCycle()
 {
 	//loop inside
 	//code for RuleIntro
@@ -179,17 +192,6 @@ inline void RuleIntroActivity::lifeCycle()
 	return;
 }
 
-class BackgroundIntroActivity final : public activity
-{
-public:
-	BackgroundIntroActivity();
-	~BackgroundIntroActivity();
-	void lifeCycle() override;
-
-private:
-
-};
-
 BackgroundIntroActivity::BackgroundIntroActivity()
 {
 }
@@ -198,7 +200,7 @@ BackgroundIntroActivity::~BackgroundIntroActivity()
 {
 }
 
-inline void BackgroundIntroActivity::lifeCycle()
+void BackgroundIntroActivity::lifeCycle()
 {
 	//loop inside
 	//code for BackgroundIntro
@@ -209,17 +211,6 @@ inline void BackgroundIntroActivity::lifeCycle()
 	return;
 }
 
-class KeyBindingIntroActivity final : public activity
-{
-public:
-	KeyBindingIntroActivity();
-	~KeyBindingIntroActivity();
-	void lifeCycle() override;
-
-private:
-
-};
-
 KeyBindingIntroActivity::KeyBindingIntroActivity()
 {
 }
@@ -228,7 +219,7 @@ KeyBindingIntroActivity::~KeyBindingIntroActivity()
 {
 }
 
-inline void KeyBindingIntroActivity::lifeCycle()
+void KeyBindingIntroActivity::lifeCycle()
 {
 	//loop inside
 	//code for KeyBindingIntro

@@ -127,14 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="object.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="activity.h" />
-    <ClInclude Include="activityManager.h" />
     <ClInclude Include="board_buried.h" />
-    <ClInclude Include="game.h" />
-    <ClInclude Include="object.h" />
+    <ClInclude Include="include.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="role_buried.h" />
   </ItemGroup>

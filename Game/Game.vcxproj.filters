@@ -18,6 +18,12 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="object.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="role_buried.h">
@@ -29,16 +35,7 @@
     <ClInclude Include="board_buried.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="activityManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="game.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="object.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="activity.h">
+    <ClInclude Include="include.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

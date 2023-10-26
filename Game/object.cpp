@@ -1,40 +1,4 @@
-#pragma once
-#include <graphics.h>
-
-// object include role, words, efforts.
-class object
-{
-public:
-	object();
-	object(POINT location, LPCTSTR pResType, LPCTSTR pResName);
-	object(POINT location, LPCTSTR pImgFile);
-	~object();
-
-	enum XorY
-	{
-		X,
-		Y
-	};
-
-	void setLocation(POINT location);
-	LONG getLocation(XorY choose) const;
-	void shiftLocation(POINT shiftValue);
-
-	// get img from resource
-	void setImg(LPCTSTR pResType, LPCTSTR pResName);
-	void setImg(LPCTSTR pImgFile);
-
-	virtual void render();
-
-protected:
-	// left-top point
-	POINT objectLocation;
-	IMAGE objectImg;
-
-	//0 as lowest layer,render first;the bigger, the later
-	//bg=0,board=1,HUD=1,word=2,effortL=3,player=4,effortH=5
-	//int renderLevel;
-};
+#include "include.h"
 
 object::object()
 {
@@ -48,7 +12,7 @@ object::object(POINT location, LPCTSTR pResType, LPCTSTR pResName)
 	setImg(pResType, pResName);
 }
 
-inline object::object(POINT location, LPCTSTR pImgFile)
+object::object(POINT location, LPCTSTR pImgFile)
 {
 	objectLocation = location;
 	setImg(pImgFile);
@@ -58,13 +22,13 @@ object::~object()
 {
 }
 
-inline void object::setLocation(POINT location)
+void object::setLocation(POINT location)
 {
 	objectLocation = location;
 	return;
 }
 
-inline LONG object::getLocation(XorY choose) const
+LONG object::getLocation(XorY choose) const
 {
 	switch (choose)
 	{
@@ -76,49 +40,30 @@ inline LONG object::getLocation(XorY choose) const
 	return 0;
 }
 
-inline void object::shiftLocation(POINT shiftValue)
+void object::shiftLocation(POINT shiftValue)
 {
 	objectLocation.x += shiftValue.x;
 	objectLocation.y += shiftValue.y;
 	return;
 }
 
-inline void object::setImg(LPCTSTR pResType, LPCTSTR pResName)
+void object::setImg(LPCTSTR pResType, LPCTSTR pResName)
 {
 	loadimage(&objectImg, pResType, pResName);
 	return;
 }
 
-inline void object::setImg(LPCTSTR pImgFile)
+void object::setImg(LPCTSTR pImgFile)
 {
 	loadimage(&objectImg, pImgFile);
 	return;
 }
 
-inline void object::render()
+void object::render()
 {
 	putimage(objectLocation.x, objectLocation.y, &objectImg);
+	return;
 }
-
-class role final: public object
-{
-public:
-	/*struct roleData
-	{
-		int attack; //attack
-		int magicAttack; //magic attack
-		int healthPoints; //health points
-		int recovery;
-		int speed;
-	}roleOriginData, roleCurrentData;*/
-
-	role();
-	//role(POINT location, LPCTSTR pResType, LPCTSTR pResName, roleData INdata);
-	role(POINT location, LPCTSTR pResType, LPCTSTR pResName);
-
-private:
-
-};
 
 role::role()
 {
@@ -136,34 +81,19 @@ role::role(POINT location, LPCTSTR pResType, LPCTSTR pResName)
 	//this->roleCurrentData = INdata;
 }
 
-class board final: protected object
-{
-public:
-	//size{4,5} meaning 4*5 board
-	void setBoardSize(POINT size);
-
-	//meaning blank size
-	void setGridSize(POINT size);
-	void render() override;
-private:
-	POINT boardSize;
-	POINT gridSize;
-	POINT boardLocation;
-};
-
-inline void board::setBoardSize(POINT size)
+void board::setBoardSize(POINT size)
 {
 	boardSize = size;
 	return;
 }
 
-inline void board::setGridSize(POINT size)
+void board::setGridSize(POINT size)
 {
 	gridSize = size;
 	return;
 }
 
-inline void board::render()
+void board::render()
 {
 	LINESTYLE pstyle;
 	getlinestyle(&pstyle);
@@ -191,4 +121,5 @@ inline void board::render()
 		y2 = boardLocation.y + boardSize.y * (lineWidth + gridSize.y);
 		line(x1, y1, x2, y2);
 	}
+	return;
 }
