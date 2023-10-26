@@ -20,13 +20,25 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="role.h">
+    <ClInclude Include="role_buried.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="board.h">
+    <ClInclude Include="board_buried.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="activityManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="activity.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

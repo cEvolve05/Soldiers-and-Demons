@@ -1,17 +1,21 @@
-/*#include <graphics.h>
+#include <graphics.h>
 #include <iostream>
 
-#include "role.h"
+#include "game.h"
+
+//role solder;//TODO
+//role demon;
 
 int main()
 {
-	initgraph(1000, 1000, EX_SHOWCONSOLE);
-	role testRole;
+	game SOD;
+	SOD.entry();
+	getchar();
 
 
 	return 0;
-}*/
-
+}
+/*
 #include <graphics.h>
 #include <iostream>
 #include <winuser.h>
@@ -19,8 +23,8 @@ int main()
 #include <wchar.h>//Debug
 
 #include "resource.h"
-#include "role.h"
-#include "board.h"
+#include "role_buried.h"
+#include "board_buried.h"
 
 //#define DEBUGG
 
@@ -36,6 +40,7 @@ int main()
 	//IMAGE player;
 	//POINT playerLocation = { windowX / 2, windowY / 2 };
 	char userLastInput = 0;
+	int InputRequireProcess = 0;
 
 	initgraph(windowX, windowY, EX_SHOWCONSOLE);
 
@@ -117,7 +122,14 @@ int main()
 					return 0;
 				}
 				if (m.vkcode == 'W' || m.vkcode == 'S' || m.vkcode == 'A' || m.vkcode == 'D')
+				{
+					if (m.vkcode==userLastInput)
+					{
+						InputRequireProcess = 0;
+					}
 					userLastInput = m.vkcode;
+				}
+				
 
 			case WM_KEYUP:
 
@@ -142,18 +154,22 @@ int main()
 		{
 		case 'W':
 			testRole.shiftLocation({0,-5});
+			InputProcessed = 1;
 			break;
 
 		case 'S':
 			testRole.shiftLocation({ 0,5 });
+			InputProcessed = 1;
 			break;
 
 		case 'A':
 			testRole.shiftLocation({ -5,0 });
+			InputProcessed = 1;
 			break;
 
 		case 'D':
 			testRole.shiftLocation({ 5,0});
+			InputProcessed = 1;
 			break;
 
 		default:
@@ -177,3 +193,4 @@ int main()
 }
 
 
+*/

@@ -130,9 +130,13 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="board.h" />
+    <ClInclude Include="activity.h" />
+    <ClInclude Include="activityManager.h" />
+    <ClInclude Include="board_buried.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="object.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="role.h" />
+    <ClInclude Include="role_buried.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />
