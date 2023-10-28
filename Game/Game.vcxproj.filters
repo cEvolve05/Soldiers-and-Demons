@@ -45,8 +45,43 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\player.png">
+    <Image Include="Resource\Demon.png">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="Resource\Soldier.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\开始界面.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\总体介绍.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\按键介绍.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\文字介绍.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\纹理2.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\背景故事.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\背景故事.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\菜单界面.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="Resource\player.png">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Resource\Gaming.mp4">
+      <Filter>资源文件</Filter>
+    </Media>
   </ItemGroup>
 </Project>

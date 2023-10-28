@@ -141,7 +141,20 @@
     <ResourceCompile Include="Game.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\player.png" />
+    <Image Include="Resource\Demon.png" />
+    <Image Include="Resource\player.png" />
+    <Image Include="Resource\Soldier.png" />
+    <Image Include="Resource\开始界面.png" />
+    <Image Include="Resource\总体介绍.jpg" />
+    <Image Include="Resource\按键介绍.jpg" />
+    <Image Include="Resource\文字介绍.jpg" />
+    <Image Include="Resource\纹理2.jpg" />
+    <Image Include="Resource\背景故事.jpg" />
+    <Image Include="Resource\背景故事.png" />
+    <Image Include="Resource\菜单界面.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Resource\Gaming.mp4" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

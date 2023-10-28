@@ -93,7 +93,10 @@ private:
 class activity
 {
 public:
+	activity();
+	~activity();
 	virtual void lifeCycle()=0;
+	void button(int x1, int y1, int x2, int y2, wchar_t arr[]);
 protected:
 	bool exitActivity;
 };
@@ -113,11 +116,36 @@ private:
 	static activity* currentActivity;
 };
 
+class StartActivity final : public activity
+{
+public:
+	void lifeCycle() override;
+
+private:
+
+};
+
+class PlayRuleIntroActivity final : public activity
+{
+public:
+	void lifeCycle() override;
+
+private:
+
+};
+
+class TextRuleIntroActivity final : public activity
+{
+public:
+	void lifeCycle() override;
+
+private:
+
+};
+
 class MenuActivity final: public activity
 {
 public:
-	MenuActivity();
-	~MenuActivity();
 	void lifeCycle() override;
 
 private:
@@ -148,8 +176,6 @@ private:
 class RuleIntroActivity final : public activity
 {
 public:
-	RuleIntroActivity();
-	~RuleIntroActivity();
 	void lifeCycle() override;
 
 private:
@@ -159,8 +185,6 @@ private:
 class BackgroundIntroActivity final : public activity
 {
 public:
-	BackgroundIntroActivity();
-	~BackgroundIntroActivity();
 	void lifeCycle() override;
 
 private:
@@ -170,8 +194,6 @@ private:
 class KeyBindingIntroActivity final : public activity
 {
 public:
-	KeyBindingIntroActivity();
-	~KeyBindingIntroActivity();
 	void lifeCycle() override;
 
 private:
