@@ -139,18 +139,23 @@ public:
 class word
 {
 public:
-	void render(POINT from, POINT to);
-
-	std::wstring text;
-	int length;
 	enum wordType
 	{
 		Subject,
 		Verb,
-		Object
+		Object,
+		Action,
+		Special,
 	};
+
+	word(std::wstring text,int length=0, wordType type);
+	void render(POINT from, POINT to);
+
+	std::wstring text;
+	int length;
 	wordType type;
 protected:
+
 };
 
 //class verbBlock : public word TODO
@@ -188,6 +193,7 @@ private:
 
 class textBox
 {
+	friend class wordProcess;
 public:
 	textBox();
 	~textBox();
@@ -205,7 +211,7 @@ private:
 
 class board
 {
-	//friend class role;
+	friend class wordProcess;
 public:
 	board();
 	~board();
@@ -247,9 +253,15 @@ private:
 class wordProcess
 {
 public:
-	//void generateWord();
-	//bool applySentence(textBox target);
+	wordProcess();
+	~wordProcess();
+
+	void generateWord(board* targetBoard);
+	bool applySentence(textBox* targetTextBox);
+
 private:
+	word** data;
+	int size[5];
 };
 
 class GamingActivity final : public activity

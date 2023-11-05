@@ -223,6 +223,20 @@ void textBox::render()
 //-------------------------------------------------------------------------------
 //class word and processor
 
+word::word(std::wstring text, int length, wordType type)
+{
+	this->text = text;
+	if (length == 0)
+	{
+		this->length = text.size();
+	}
+	else
+	{
+		this->length = length;
+	}
+	this->type = type;
+}
+
 void word::render(POINT from, POINT to)
 {
 	fillrectangle(from.x, from.y, to.x, to.y);
@@ -234,7 +248,101 @@ void word::render(POINT from, POINT to)
 	outtextxy(from.x + 2, from.y + 2, (LPCTSTR)text.c_str());
 }
 
+wordProcess::wordProcess()
+{
+	//constructor
+	this->data = new word * [5]
+	{
+		//Subject
+		new word[2]
+		{
+			{L"勇者",2,word::Subject},
+			{L"魔王",2,word::Subject},
+		},
 
+		//Verb
+		new word[2]
+		{
+			{L"使用",2,word::Verb},
+			//{L"进行",0,word::Verb},
+			//{L"释放",0,word::Verb},
+			{L"使出",2,word::Verb},
+		},
+
+		//Object
+		new word[2]
+		{
+			{L"食物",2,word::Object},
+			{L"药剂",2,word::Object},
+		},
+
+		//Action
+		new word[3]
+		{
+			{L"攻击",2,word::Action},
+			{L"强力攻击",4,word::Action},
+			{L"防御",2,word::Action},
+		},
+
+		//Special
+		new word[4]
+		{
+			{L"清空文本框",5,word::Special},
+			{L"移除词块",4,word::Special},
+			{L"生成词块",4,word::Special},
+			{L"禁用棋盘",4,word::Special},
+		},
+	};
+	
+	for (int i = 0; i < 5; i++)
+	{
+		this->size[i] = sizeof(data[i])/sizeof(word);
+	}
+
+}
+
+wordProcess::~wordProcess()
+{
+	//destructor
+	for (int i = 0; i < 5; i++)
+	{
+		delete[] data[i];
+	}
+	delete[] data;
+}
+
+void wordProcess::generateWord(board* targetBoard)
+{
+	// word type
+	static int targetType = rand()%5;
+	// word detail
+	static int wordIndex = rand() % size[targetType];
+
+	// word location
+	static board::wordBlock*** boardStatue = targetBoard->WordInBoard;
+	int wordSize = data[targetType][wordIndex].length;
+	static int count,cycle=-1;
+	static POINT headLocation;
+	do
+	{
+		count = 0;
+		cycle += 1;
+		headLocation={ rand() % targetBoard->grid.x,rand() % targetBoard->grid.y };
+		for (int i = 0; i < wordSize; i++)
+		{
+			count += bool(boardStatue[headLocation.x][headLocation.y]);
+		}
+		
+	} while (count == 0 || cycle >= 10);
+
+	targetBoard->addWord(new word{ data[targetType][wordIndex] }, headLocation);
+	return;
+}
+
+void applySentence(textBox* targetTextBox)
+{
+
+}
 
 //-------------------------------------------------------------------------------
 //class board

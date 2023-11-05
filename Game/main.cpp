@@ -10,6 +10,7 @@
 
 int main()
 {
+	srand((unsigned int)time(NULL));
 	game SOD;
 	SOD.entry();
 	getchar();
