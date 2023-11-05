@@ -12,12 +12,13 @@
 
 using namespace std;
 
+
 int main()
 {
-	initgraph(1024, 615);
-	IMAGE background;
-	loadimage(&background, L"./Resource/开始界面.png", 0, 0);
-	putimage(0, 0, &background);
+	initgraph(640, 480);
+
+	settextstyle(20, 0, L"黑体");
+	outtextxy(100, 100, L"Hello World!中文");
 
 	_getch();
 	

@@ -3,6 +3,8 @@
 
 #include "include.h"
 
+#pragma execution_character_set("utf-8")
+
 //role solder;//TODO
 //role demon;
 

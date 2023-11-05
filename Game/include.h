@@ -2,6 +2,7 @@
 #include <graphics.h>
 #include <iostream>
 #include <winuser.h>
+#include <queue>
 
 class game
 {
@@ -21,74 +22,39 @@ private:
 };
 
 // object include role, words, efforts.
-class object
-{
-public:
-	object();
-	object(POINT location, LPCTSTR pResType, LPCTSTR pResName);
-	object(POINT location, LPCTSTR pImgFile);
-	~object();
-
-	enum XorY
-	{
-		X,
-		Y
-	};
-
-	void setLocation(POINT location);
-	LONG getLocation(XorY choose) const;
-	void shiftLocation(POINT shiftValue);
-
-	// get img from resource
-	void setImg(LPCTSTR pResType, LPCTSTR pResName);
-	void setImg(LPCTSTR pImgFile);
-
-	virtual void render();
-
-protected:
-	// left-top point
-	POINT objectLocation;
-	IMAGE objectImg;
-
-	//0 as lowest layer,render first;the bigger, the later
-	//bg=0,board=1,HUD=1,word=2,effortL=3,player=4,effortH=5
-	//int renderLevel;
-};
-
-class role final: public object
-{
-public:
-	/*struct roleData
-	{
-		int attack; //attack
-		int magicAttack; //magic attack
-		int healthPoints; //health points
-		int recovery;
-		int speed;
-	}roleOriginData, roleCurrentData;*/
-
-	role();
-	//role(POINT location, LPCTSTR pResType, LPCTSTR pResName, roleData INdata);
-	role(POINT location, LPCTSTR pResType, LPCTSTR pResName);
-
-private:
-
-};
-
-class board final: protected object
-{
-public:
-	//size{4,5} meaning 4*5 board
-	void setBoardSize(POINT size);
-
-	//meaning blank size
-	void setGridSize(POINT size);
-	void render() override;
-private:
-	POINT boardSize;
-	POINT gridSize;
-	POINT boardLocation;
-};
+//class object
+//{
+//public:
+//	object();
+//	~object();
+//
+//	enum XorY
+//	{
+//		X,
+//		Y
+//	};
+//
+//	void setLocation(POINT location);
+//	LONG getLocation(XorY choose) const;
+//	void shiftLocation(POINT shiftValue);
+//
+//	// get img from resource
+//	void setImg(LPCTSTR pResType, LPCTSTR pResName);
+//	void setImg(LPCTSTR pImgFile);
+//
+//	virtual void render();
+//
+//protected:
+//	// left-top point
+//	POINT objectLocation;
+//	IMAGE objectImg;
+//
+//	POINT size;
+//
+//	//0 as lowest layer,render first;the bigger, the later
+//	//bg=0,board=1,HUD=1,word=2,effortL=3,player=4,effortH=5
+//	//int renderLevel;
+//};
 
 class activity
 {
@@ -152,50 +118,156 @@ private:
 
 };
 
-class GamingActivity final : public activity
-{
-public:
-	GamingActivity();
-	~GamingActivity();
-	void lifeCycle() override;
-
-private:
-	ExMessage m;
-	char LuserLastInput, RuserLastInput;
-	bool LinputRequireProcess, RinputRequireProcess;
-
-	role L;
-	role R;
-
-	void inputProcess();
-	void process();
-	void render();
-
-};
-
 class RuleIntroActivity final : public activity
 {
 public:
 	void lifeCycle() override;
-
-private:
-
 };
 
 class BackgroundIntroActivity final : public activity
 {
 public:
 	void lifeCycle() override;
-
-private:
-
 };
 
 class KeyBindingIntroActivity final : public activity
 {
 public:
 	void lifeCycle() override;
+};
+
+class word
+{
+public:
+	void render(POINT from, POINT to);
+
+	std::wstring text;
+	int length;
+	enum wordType
+	{
+		Subject,
+		Verb,
+		Object
+	};
+	wordType type;
+protected:
+};
+
+//class verbBlock : public word TODO
+
+//class nounBlock : public word TODO
+
+
+class role
+{
+public:
+	/*struct roleData
+	{
+		int attack; //attack
+		int magicAttack; //magic attack
+		int healthPoints; //health points
+		int recovery;
+		int speed;
+	}roleOriginData, roleCurrentData;*/
+
+	role();
+	void setLocation(POINT location);
+	void setImg(LPCTSTR pResType, LPCTSTR pResName, POINT size);
+	void setImg(LPCTSTR pImgFile, POINT size);
+
+	void render();
+
+	//role(POINT location, LPCTSTR pResType, LPCTSTR pResName, roleData INdata);
+	//role(POINT location, LPCTSTR pResType, LPCTSTR pResName);
+
+	int health;
+private:
+	POINT location;
+	IMAGE img;
+};
+
+class textBox
+{
+public:
+	textBox();
+	~textBox();
+
+	void addWord(word* INword);
+	void empty();
+
+	void setLocation(POINT from, POINT to);
+
+	void render();
+private:
+	std::vector<word*> words;
+	POINT from, to;
+};
+
+class board
+{
+	//friend class role;
+public:
+	board();
+	~board();
+
+	role* player;
+
+	//render from from to to
+	void setBoardLocation(POINT from, POINT to);
+	//size{4,5} meaning 4*5 board
+	void setGrid(POINT grid);
+	void init(LPCTSTR pImgFile);
+
+	void setPlayerLocation(POINT location);
+	void getGridLocation(POINT& from, POINT& to, POINT gridLocationFrom, POINT gridLocationTo={-1,-1}) const;
+	POINT getGridLocation(POINT location);
+	void addWord(word* word, POINT wordHeadLocation);
+	word* getWord(POINT location);
+	void delWord(POINT location);
+
+	void render() const;
+
+	POINT playerLocation;//grid location
+private:
+	struct wordBlock
+	{
+		word* word;
+		POINT headLocation;
+	};
+	POINT from, to;//for location
+	POINT grid;//for board grid
+	std::vector<wordBlock*> wordVault;//存放所有的wordVault的指针的向量
+	wordBlock*** WordInBoard;//一个存放各个格子的（指向这个格子对应的wordVault的指针）的二维数组
+	
+	//Auto generate:
+	DWORD lineWidth;
+	POINT gridBlankSize;
+};
+
+class wordProcess
+{
+public:
+	//void generateWord();
+	//bool applySentence(textBox target);
+private:
+};
+
+class GamingActivity final : public activity
+{
+public:
+	void lifeCycle() override;
 
 private:
+	ExMessage m;
+	std::queue<int> input;
 
+	board* L;
+	textBox* Lbox;
+
+	void init();
+	void end();
+
+	void inputFilter();
+	void process();
+	void render();
 };
