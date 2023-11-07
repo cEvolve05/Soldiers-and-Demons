@@ -35,7 +35,7 @@ void game::entry()
 
 void game::init()
 {
-	initgraph(1024, 615, EX_SHOWCONSOLE | EW_NOCLOSE);
+	initgraph(windowSize::X, windowSize::Y, EX_SHOWCONSOLE | EW_NOCLOSE);
 	activityManager::setActivity(new StartActivity);
 	return;
 }

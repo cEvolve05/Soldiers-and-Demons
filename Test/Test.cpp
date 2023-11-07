@@ -53,53 +53,53 @@ word::word(std::wstring text, int length, wordType type)
 
 int main()
 {
-	word ** data = new word * [5]
-		{
-			//Subject
-			new word[2]
-			{
-				{L"勇者",2,word::Subject},
-				{L"魔王",2,word::Subject},
-			},
+	//word ** data = new word * [5]
+	//	{
+	//		//Subject
+	//		new word[2]
+	//		{
+	//			{L"勇者",2,word::Subject},
+	//			{L"魔王",2,word::Subject},
+	//		},
 
-			//Verb
-				new word[2]
-			{
-				{L"使用",2,word::Verb},
-				//{L"进行",0,word::Verb},
-				//{L"释放",0,word::Verb},
-				{L"使出",2,word::Verb},
-			},
+	//		//Verb
+	//			new word[2]
+	//		{
+	//			{L"使用",2,word::Verb},
+	//			//{L"进行",0,word::Verb},
+	//			//{L"释放",0,word::Verb},
+	//			{L"使出",2,word::Verb},
+	//		},
 
-			//Object
-				new word[2]
-			{
-				{L"食物",2,word::Object},
-				{L"药剂",2,word::Object},
-			},
+	//		//Object
+	//			new word[2]
+	//		{
+	//			{L"食物",2,word::Object},
+	//			{L"药剂",2,word::Object},
+	//		},
 
-			//Action
-				new word[3]
-			{
-				{L"攻击",2,word::Action},
-				{L"强力攻击",4,word::Action},
-				{L"防御",2,word::Action},
-			},
+	//		//Action
+	//			new word[3]
+	//		{
+	//			{L"攻击",2,word::Action},
+	//			{L"强力攻击",4,word::Action},
+	//			{L"防御",2,word::Action},
+	//		},
 
-			//Special
-				new word[4]
-			{
-				{L"清空文本框",5,word::Special},
-				{L"移除词块",4,word::Special},
-				{L"生成词块",4,word::Special},
-				{L"禁用棋盘",4,word::Special},
-			},
-		};
-	wcout.imbue(locale("zh-CN"));
-	wcout << data[2][1].text;
-	wcout << L"dwdwd";
-	cout << "a";
-
+	//		//Special
+	//			new word[4]
+	//		{
+	//			{L"清空文本框",5,word::Special},
+	//			{L"移除词块",4,word::Special},
+	//			{L"生成词块",4,word::Special},
+	//			{L"禁用棋盘",4,word::Special},
+	//		},
+	//	};
+	for (int i = 0; i < 20; i++)
+	{
+		int targetType = rand() % 5;
+		cout<< targetType <<endl;
+	}
 	_getch();
 	
 	return 0;

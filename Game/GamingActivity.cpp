@@ -4,12 +4,25 @@ void GamingActivity::init()
 {
 	BeginBatchDraw();
 	this->m = { 0 };
+
+
 	L = new board;
-	Lbox = new textBox;
-	L->setBoardLocation({ 40,40 }, { 440,440 });
+	L->setBoardLocation({ 40,40 }, { 40 + 411,40 + 411 });
 	L->setGrid({ 10,10 });
-	L->init(L"./Resource/player.png");
-	Lbox->setLocation({ 40,530 }, { 440,575 });
+	L->init();
+	L->player->label = L"勇者";
+	L->player->setImg(L"./Resource/player.png");
+	L->sentence->setLocation({ 40,windowSize::Y - 40 - 45 }, { 40 + 411,windowSize::Y - 40 });
+
+	R = new board;
+	R->setBoardLocation({ windowSize::X - 40 - 411,40 }, { windowSize::X - 40,40 + 411 });
+	R->setGrid({ 10,10 });
+	R->init();
+	R->player->label = L"魔王";
+	R->player->setImg(L"./Resource/player.png");
+	R->sentence->setLocation({ windowSize::X - 40 - 411,windowSize::Y - 40 - 45 }, { windowSize::X - 40,windowSize::Y - 40 });
+
+	wordProc = new wordProcess;
 
 	setfillcolor(WHITE);
 	setlinecolor(BLACK);
@@ -19,8 +32,7 @@ void GamingActivity::init()
 
 void GamingActivity::end()
 {
-	delete L;
-	delete Lbox;
+	delete L, R;
 	EndBatchDraw();
 	return;
 }
@@ -30,13 +42,15 @@ void GamingActivity::lifeCycle()
 	//loop inside
 	//code for Gaming
 	cleardevice();
-	IMAGE img;
-	loadimage(&img, L"./Resource/GamingUI.png", 0, 0);
-	putimage(0, 0, &img);
-	wchar_t arr[] = L"主菜单";
-	button(457, 536, 457 + 110, 536 + 40, arr);
+	button(457, 536, 457 + 110, 536 + 40, (wchar_t*)L"主菜单");
 	init();
-	L->addWord(new word{ L"魔王",2 ,word::Subject }, { 0,0 });
+	//L->addWord(new word{ L"魔王",2 ,word::Subject }, { 0,0 });
+	for (int i = 0; i < 5; i++)
+	{
+		wordProc->generateWord(L);
+		wordProc->generateWord(R);
+	}
+
 	while (game::getRunningStatus() && !exitActivity)
 	{
 		//std::cout << "cycle start" << std::endl;
@@ -100,6 +114,7 @@ void GamingActivity::process()
 	{
 		switch (input.front())
 		{
+
 		case 'W':
 			//Left Role Move Up
 			this->L->setPlayerLocation({ this->L->playerLocation.x,this->L->playerLocation.y - 1 });
@@ -116,30 +131,54 @@ void GamingActivity::process()
 			//Left Role Move Right
 			this->L->setPlayerLocation({ this->L->playerLocation.x + 1,this->L->playerLocation.y });
 			break;
-		case VK_UP:
-			//Right Role Move Up
-			break;
-		case VK_LEFT:
-			//Right Role Move Left
-			break;
-		case VK_DOWN:
-			//Right Role Move Down
-			break;
-		case VK_RIGHT:
-			//Right Role Move Right
-			break;
 		case 'F':
 			//Left Role get word
-			Lbox->addWord(L->getWord(L->playerLocation));
+			L->sentence->addWord(L->getWord(L->playerLocation));
 			L->delWord(L->playerLocation);
 			break;
 		case 'E':
 			//erase textBox
-			Lbox->empty();
+			L->sentence->empty();
 			break;
-		case '0':
+		case 'R':
+			//apply sentence
+			wordProc->applySentence(L, R);
+			break;
+
+
+
+		case VK_UP:
+			//Right Role Move Up
+			this->R->setPlayerLocation({ this->R->playerLocation.x,this->R->playerLocation.y - 1 });
+			break;
+		case VK_LEFT:
+			//Right Role Move Left
+			this->R->setPlayerLocation({ this->R->playerLocation.x - 1,this->R->playerLocation.y });
+			break;
+		case VK_DOWN:
+			//Right Role Move Down
+			this->R->setPlayerLocation({ this->R->playerLocation.x,this->R->playerLocation.y + 1 });
+			break;
+		case VK_RIGHT:
+			//Right Role Move Right
+			this->R->setPlayerLocation({ this->R->playerLocation.x + 1,this->R->playerLocation.y });
+			break;
+		case 'B':
 			//Right Role get word
+			R->sentence->addWord(R->getWord(R->playerLocation));
+			R->delWord(R->playerLocation);
 			break;
+		case 'N':
+			//erase textBox
+			R->sentence->empty();
+			break;
+		case 'M':
+			//apply sentence
+			wordProc->applySentence(R, L);
+			break;
+
+
+
 		case VK_ESCAPE:
 			//Exit Game
 			activityManager::setActivity(new MenuActivity);
@@ -150,20 +189,59 @@ void GamingActivity::process()
 		}
 		input.pop();
 	}
+
+	using namespace std::chrono;
+	static auto generateTimer = steady_clock::now();
+	if (duration_cast<seconds>(steady_clock::now() - generateTimer).count() > 0.2)
+	{
+		generateTimer = steady_clock::now();
+		wordProc->generateWord(L);
+		wordProc->generateWord(R);
+	}
+
+
+	if (L->blocked == 1 && duration_cast<seconds>(steady_clock::now() - L->removeBlockTimer).count()>5)
+	{
+		L->removeBlock();
+	}
+
+
 	return;
 }
 
 void GamingActivity::render()
 {
 	//std::cout << "render" << std::endl;
+
+	if (L->player->property[role::HealthPoint] < 1 || R->player->property[role::HealthPoint] < 1)
+	{
+		std::wcout << L"勇者血量：" << L->player->property[role::HealthPoint] << std::endl;
+		std::wcout << L"魔王血量：" << R->player->property[role::HealthPoint] << std::endl;
+
+		POINT from{ windowSize::X / 2 - 100,windowSize::Y / 2 - 200 }, to{ windowSize::X / 2 + 100,windowSize::Y / 2 + 200 };
+
+		std::wstring text = std::format(L"勇者血量：{}\n魔王血量：{}", L->player->property[role::HealthPoint], R->player->property[role::HealthPoint]);
+		outtextxy((to.x - from.x - textwidth(text.c_str())) / 2 + from.x, (to.y - from.y - textheight(text.c_str())) / 2 + from.y, (LPCTSTR)text.c_str());
+
+		button(457, 536, 457 + 110, 536 + 40, (wchar_t*)L"主菜单");
+		return;
+	}
+
+	IMAGE img;
+	loadimage(&img, L"./Resource/Background.jpg", 0, 0);
+	putimage(0, 0, &img);
 	L->render();
-	Lbox->render();
+	L->sentence->render();
+	R->render();
+	R->sentence->render();
+	button(457, 536, 457 + 110, 536 + 40, (wchar_t*)L"主菜单");
 	FlushBatchDraw();
 	return;
 }
 
 //-------------------------------------------------------------------------------
 //class TextBox
+
 textBox::textBox()
 {
 	//constructor
@@ -240,12 +318,12 @@ word::word(std::wstring text, int length, wordType type)
 void word::render(POINT from, POINT to)
 {
 	fillrectangle(from.x, from.y, to.x, to.y);
-	settextstyle(to.y - from.y - 4, (to.y - from.y - 4) / length, L"黑体");
+	settextstyle(to.y - from.y - 4, 0, L"黑体");
 	//if (textwidth((LPCTSTR)text.c_str()) > length)
 	//{
 	//	std::cout << "text too long" << std::endl;
 	//}
-	outtextxy(from.x + 2, from.y + 2, (LPCTSTR)text.c_str());
+	outtextxy((to.x - from.x - textwidth(this->text.c_str())) / 2 + from.x, (to.y - from.y - textheight(this->text.c_str())) / 2 + from.y, (LPCTSTR)text.c_str());
 }
 
 wordProcess::wordProcess()
@@ -261,7 +339,7 @@ wordProcess::wordProcess()
 		},
 
 		//Verb
-		new word[2]
+			new word[2]
 		{
 			{L"使用",2,word::Verb},
 			//{L"进行",0,word::Verb},
@@ -270,22 +348,22 @@ wordProcess::wordProcess()
 		},
 
 		//Object
-		new word[2]
+			new word[2]
 		{
-			{L"食物",2,word::Object},
-			{L"药剂",2,word::Object},
+			{L"食物",2,word::Item},
+			{L"药剂",2,word::Item},
 		},
 
 		//Action
-		new word[3]
+			new word[2]
 		{
 			{L"攻击",2,word::Action},
 			{L"强力攻击",4,word::Action},
-			{L"防御",2,word::Action},
+			//{L"防御",2,word::Action},
 		},
 
 		//Special
-		new word[4]
+			new word[4]
 		{
 			{L"清空文本框",5,word::Special},
 			{L"移除词块",4,word::Special},
@@ -293,11 +371,13 @@ wordProcess::wordProcess()
 			{L"禁用棋盘",4,word::Special},
 		},
 	};
-	
-	for (int i = 0; i < 5; i++)
-	{
-		this->size[i] = sizeof(data[i])/sizeof(word);
-	}
+
+	this->size = new int [5] { 2, 2, 2, 2, 4 };
+
+	//for (int i = 0; i < 5; i++)
+	//{
+	//	this->size[i] = sizeof(data[i]) / sizeof(word);
+	//}
 
 }
 
@@ -314,35 +394,152 @@ wordProcess::~wordProcess()
 void wordProcess::generateWord(board* targetBoard)
 {
 	// word type
-	static int targetType = rand()%5;
+	int targetType = rand() % 5;
 	// word detail
-	static int wordIndex = rand() % size[targetType];
+	int wordIndex = rand() % size[targetType];
 
 	// word location
-	static board::wordBlock*** boardStatue = targetBoard->WordInBoard;
+	board::wordBlock*** boardStatue = targetBoard->WordInBoard;
 	int wordSize = data[targetType][wordIndex].length;
-	static int count,cycle=-1;
-	static POINT headLocation;
-	do
+	int count = 0;
+	POINT headLocation;
+	for (int i = 0; i < 5; i++)
 	{
-		count = 0;
-		cycle += 1;
-		headLocation={ rand() % targetBoard->grid.x,rand() % targetBoard->grid.y };
+		headLocation =
+		{
+			rand() % (targetBoard->grid.x - (wordSize - 1)),
+			rand() % targetBoard->grid.y
+		};
 		for (int i = 0; i < wordSize; i++)
 		{
-			count += bool(boardStatue[headLocation.x][headLocation.y]);
+			count += bool(boardStatue[headLocation.x + i][headLocation.y]);
 		}
-		
-	} while (count == 0 || cycle >= 10);
-
-	targetBoard->addWord(new word{ data[targetType][wordIndex] }, headLocation);
+		if (count == 0)
+		{
+			targetBoard->addWord(new word{ data[targetType][wordIndex] }, headLocation);
+			break;
+		}
+	}
 	return;
 }
 
-void applySentence(textBox* targetTextBox)
+bool wordProcess::applySentence(board* from, board* to)
 {
+	std::vector<word*>& sentence = from->sentence->words;
 
+	if (sentence[0]->text != from->player->label || sentence[1]->type != word::Verb)
+	{
+		from->sentence->empty();
+		return false;
+	}
+
+	if ((sentence[1]->text == L"使用" && sentence[2]->type != word::Item) ||
+		(sentence[1]->text == L"使出" && sentence[2]->type == word::Item))
+	{
+		from->sentence->empty();
+		return false;
+	}
+
+	if (sentence[1]->text == L"使用")
+	{
+		useItem(sentence[2], from, to);
+	}
+	else if (sentence[1]->text == L"使出")
+	{
+		makeAction(sentence[2], from, to);
+	}
+	from->sentence->empty();
+	return true;
 }
+
+void wordProcess::useItem(word* item, board* from, board* to)
+{
+	if (item->text == L"食物")
+	{
+		from->player->shiftProerty(role::HealthPoint, +1);
+	}
+	else if (item->text == L"药剂")
+	{
+		from->player->shiftProerty(role::HealthPoint, +2);
+	}
+
+	return;
+}
+
+void wordProcess::makeAction(word* item, board* from, board* to)
+{
+	// Action
+	if (item->text == L"攻击")
+	{
+		to->player->shiftProerty(role::HealthPoint, -1);
+	}
+	else if (item->text == L"强力攻击")
+	{
+		to->player->shiftProerty(role::HealthPoint, -2);
+	}
+	else if (item->text == L"防御")
+	{
+		from->player->shiftProerty(role::Defence, -1);
+	}
+	// Special
+	else if (item->text == L"清空文本框")
+	{
+		to->sentence->empty();
+	}
+	else if (item->text == L"移除词块")
+	{
+		removeBlock(to);
+	}
+	else if (item->text == L"生成词块")
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			generateWord(from);
+		}
+	}
+	else if (item->text == L"禁用棋盘")
+	{
+		blockBoard(to);
+	}
+
+	return;
+}
+
+void wordProcess::removeBlock(board* target)
+{
+	int cycleTime = target->wordVault.size() * 0.5;// decide % to remove
+	for (int i = 0; i < cycleTime; i++)
+	{
+		target->delWord(target->wordVault[rand() % target->wordVault.size()]->headLocation);
+	}
+	return;
+}
+
+void wordProcess::blockBoard(board* target)
+{
+	int cycleTime = target->grid.x * target->grid.y * 0.3;// decide % to block
+	for (int i = 0; i < cycleTime; i++)
+	{
+		POINT location =
+		{
+			rand() % target->grid.x,
+			rand() % target->grid.y
+		};
+		if (target->BlockedGrid[location.x][location.y] == 0)
+		{
+			target->BlockedGrid[location.x][location.y] = 1;
+		}
+		else
+		{
+			i--;
+		}
+	}
+
+	target->removeBlockTimer = std::chrono::steady_clock::now();
+	target->blocked = 1;
+	return;
+}
+
 
 //-------------------------------------------------------------------------------
 //class board
@@ -358,6 +555,8 @@ board::board()
 	this->gridBlankSize = { 0 };
 	this->player = new role;
 	this->playerLocation = { 0 };
+	this->sentence = new textBox;
+	this->BlockedGrid = { 0 };
 }
 
 board::~board()
@@ -377,6 +576,7 @@ board::~board()
 	wordVault.clear();
 
 	delete player;
+	delete sentence;
 }
 
 void board::setBoardLocation(POINT from, POINT to)
@@ -392,7 +592,7 @@ void board::setGrid(POINT grid)
 	return;
 }
 
-void board::init(LPCTSTR pImgFile)
+void board::init()
 {
 	LINESTYLE pstyle;
 	getlinestyle(&pstyle);
@@ -412,8 +612,13 @@ void board::init(LPCTSTR pImgFile)
 		WordInBoard[i] = (new wordBlock * [grid.y] {NULL});
 	}
 
+	this->BlockedGrid = new int* [grid.x];
+	for (int i = 0; i < grid.x; i++)
+	{
+		BlockedGrid[i] = (new int [grid.y] {0});
+	}
+
 	// init role
-	this->player->setImg(pImgFile, { gridBlankSize.x - 2, gridBlankSize.y - 2 });
 	this->setPlayerLocation({ 0,0 });
 
 	return;
@@ -421,7 +626,7 @@ void board::init(LPCTSTR pImgFile)
 
 void board::setPlayerLocation(POINT location)
 {
-	if (location.x<0 || location.y <0 || location.x > this->grid.x - 1 || location.y > this->grid.y - 1)
+	if (location.x<0 || location.y <0 || location.x > this->grid.x - 1 || location.y > this->grid.y - 1 || BlockedGrid[location.x][location.y] == 1)
 	{
 		return;
 	}
@@ -467,15 +672,22 @@ POINT board::getGridLocation(POINT location)
 	return OUTfrom;
 }
 
-void board::addWord(word* word, POINT wordHeadLocation)
+bool board::addWord(word* word, POINT wordHeadLocation)
 {
+	if (wordHeadLocation.x<0 ||
+		wordHeadLocation.x + word->length - 1>grid.x ||
+		wordHeadLocation.y < 0)
+	{
+		return false;
+	}
+
 	wordBlock* newWordBlock = new wordBlock{ word,wordHeadLocation };
 	this->wordVault.push_back(newWordBlock);
 	for (int i = 0; i < word->length; i++)
 	{
 		this->WordInBoard[wordHeadLocation.x + i][wordHeadLocation.y] = newWordBlock;
 	}
-	return;
+	return true;
 }
 
 word* board::getWord(POINT location)
@@ -499,6 +711,19 @@ void board::delWord(POINT location)
 			break;
 		}
 	}
+	return;
+}
+
+void board::removeBlock()
+{
+	for (int i = 0; i < grid.x; i++)
+	{
+		for (int i = 0; i < grid.y; i++)
+		{
+			BlockedGrid[i][i] = 0;
+		}
+	}
+	blocked = 0;
 	return;
 }
 
@@ -532,7 +757,35 @@ void board::render() const
 		(*iter)->word->render({ from.x - 1,from.y - 1 }, { to.x - 1,to.y - 1 });
 	}
 
+	//draw blocked grid
+	for (int i = 0; i < grid.x; i++)
+	{
+		for (int j = 0; j < grid.y; j++)
+		{
+			if (BlockedGrid[i][j] == 1)
+			{
+				POINT from, to;
+				this->getGridLocation(from, to, { i,j });
+				line(from.x, from.y, to.x, to.y);
+				line(from.x, to.y, to.x, from.y);
+			}
+		}
+	}
+
+	//draw player
 	this->player->render();
+
+	//HP render
+	IMAGE img;
+	loadimage(&img, L"./Resource/HP.png", 0, 0);
+	fillrectangle(from.x, ((windowSize::Y - 40 - 45) - to.y - 40) / 2 + to.y,
+		to.x, ((windowSize::Y - 40 - 45) - to.y - 40) / 2 + to.y + 40);
+
+	for (int i = 1; i <= this->player->property[role::HealthPoint]; i++)
+	{
+		putimage(to.x - 36 * i, ((windowSize::Y - 40 - 45) - to.y - 40) / 2 + to.y + 4, &img);
+	}
+
 	return;
 }
 
@@ -541,7 +794,8 @@ void board::render() const
 
 role::role()
 {
-	this->health = 5;
+	this->property = new int[roleProperty::COUNT] {5, 0};
+	this->MaxProperty = new const int[roleProperty::COUNT] {5, INT_MAX};
 	this->location = { 0 };
 }
 
@@ -561,6 +815,18 @@ void role::setImg(LPCTSTR pImgFile, POINT size)
 {
 	loadimage(&this->img, pImgFile, size.x, size.y);
 	return;
+}
+
+bool role::shiftProerty(roleProperty targetProperty, int shiftValue)
+{
+	if (property[targetProperty] + shiftValue > MaxProperty[targetProperty])
+	{
+		return false;
+	}
+
+	property[targetProperty] += shiftValue;
+
+	return true;
 }
 
 void role::render()

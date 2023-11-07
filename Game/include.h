@@ -3,6 +3,16 @@
 #include <iostream>
 #include <winuser.h>
 #include <queue>
+#include <limits>
+#include <string>
+#include <format>
+#include <chrono>
+
+enum windowSize
+{
+	X = 1024,
+	Y = 615
+};
 
 class game
 {
@@ -61,7 +71,7 @@ class activity
 public:
 	activity();
 	~activity();
-	virtual void lifeCycle()=0;
+	virtual void lifeCycle() = 0;
 	void button(int x1, int y1, int x2, int y2, wchar_t arr[]);
 protected:
 	bool exitActivity;
@@ -109,7 +119,7 @@ private:
 
 };
 
-class MenuActivity final: public activity
+class MenuActivity final : public activity
 {
 public:
 	void lifeCycle() override;
@@ -143,12 +153,13 @@ public:
 	{
 		Subject,
 		Verb,
-		Object,
+		Item,
 		Action,
 		Special,
+		COUNT //Last one
 	};
 
-	word(std::wstring text,int length=0, wordType type);
+	word(std::wstring text, int length = 0, wordType type = COUNT);
 	void render(POINT from, POINT to);
 
 	std::wstring text;
@@ -174,18 +185,27 @@ public:
 		int recovery;
 		int speed;
 	}roleOriginData, roleCurrentData;*/
+	std::wstring label;
+	enum roleProperty
+	{
+		HealthPoint,
+		Defence,
+		COUNT //Last one
+	};
+	int* property;
+	const int* MaxProperty;
 
 	role();
 	void setLocation(POINT location);
-	void setImg(LPCTSTR pResType, LPCTSTR pResName, POINT size);
-	void setImg(LPCTSTR pImgFile, POINT size);
+	void setImg(LPCTSTR pResType, LPCTSTR pResName, POINT size={0});
+	void setImg(LPCTSTR pImgFile, POINT size={0});
+
+	bool shiftProerty(roleProperty targetProperty, int shiftValue);
 
 	void render();
 
 	//role(POINT location, LPCTSTR pResType, LPCTSTR pResName, roleData INdata);
 	//role(POINT location, LPCTSTR pResType, LPCTSTR pResName);
-
-	int health;
 private:
 	POINT location;
 	IMAGE img;
@@ -212,28 +232,32 @@ private:
 class board
 {
 	friend class wordProcess;
+	friend class GamingActivity;
 public:
 	board();
 	~board();
 
 	role* player;
+	POINT playerLocation;//grid location
+
+	textBox* sentence;
 
 	//render from from to to
 	void setBoardLocation(POINT from, POINT to);
 	//size{4,5} meaning 4*5 board
 	void setGrid(POINT grid);
-	void init(LPCTSTR pImgFile);
+	void init();
 
 	void setPlayerLocation(POINT location);
-	void getGridLocation(POINT& from, POINT& to, POINT gridLocationFrom, POINT gridLocationTo={-1,-1}) const;
+	void getGridLocation(POINT& from, POINT& to, POINT gridLocationFrom, POINT gridLocationTo = { -1,-1 }) const;
 	POINT getGridLocation(POINT location);
-	void addWord(word* word, POINT wordHeadLocation);
+	bool addWord(word* word, POINT wordHeadLocation);
 	word* getWord(POINT location);
 	void delWord(POINT location);
 
-	void render() const;
+	void removeBlock();
 
-	POINT playerLocation;//grid location
+	void render() const;
 private:
 	struct wordBlock
 	{
@@ -244,10 +268,14 @@ private:
 	POINT grid;//for board grid
 	std::vector<wordBlock*> wordVault;//存放所有的wordVault的指针的向量
 	wordBlock*** WordInBoard;//一个存放各个格子的（指向这个格子对应的wordVault的指针）的二维数组
-	
+	int** BlockedGrid;
+	std::chrono::steady_clock::time_point removeBlockTimer;
+	bool blocked=0;
+
 	//Auto generate:
 	DWORD lineWidth;
 	POINT gridBlankSize;
+
 };
 
 class wordProcess
@@ -257,11 +285,19 @@ public:
 	~wordProcess();
 
 	void generateWord(board* targetBoard);
-	bool applySentence(textBox* targetTextBox);
+	bool applySentence(board* from, board* to/*textBox* targetTextBox, role* from, role* to*/);
 
 private:
+
+	void useItem(word* item, board* from, board* to);
+	void makeAction(word* item, board* from, board* to);
+
+	void removeBlock(board* target);
+	void blockBoard(board* target);
+
+
 	word** data;
-	int size[5];
+	int* size;
 };
 
 class GamingActivity final : public activity
@@ -273,8 +309,9 @@ private:
 	ExMessage m;
 	std::queue<int> input;
 
-	board* L;
-	textBox* Lbox;
+	board* L, * R;
+
+	wordProcess* wordProc;
 
 	void init();
 	void end();
