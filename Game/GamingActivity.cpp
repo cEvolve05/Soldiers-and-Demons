@@ -109,7 +109,7 @@ void GamingActivity::inputFilter()
 
 void GamingActivity::process()
 {
-	//std::cout << "process" << std::endl;
+	//input process
 	while (input.empty() == 0)
 	{
 		switch (input.front())
@@ -191,6 +191,8 @@ void GamingActivity::process()
 	}
 
 	using namespace std::chrono;
+
+	//generate word
 	static auto generateTimer = steady_clock::now();
 	if (duration_cast<seconds>(steady_clock::now() - generateTimer).count() > 0.2)
 	{
@@ -200,11 +202,15 @@ void GamingActivity::process()
 	}
 
 
-	if (L->blocked == 1 && duration_cast<seconds>(steady_clock::now() - L->removeBlockTimer).count()>5)
+	if (L->blocked == 1 && duration_cast<seconds>(steady_clock::now() - L->removeBlockTimer).count() > 5)
 	{
 		L->removeBlock();
 	}
-
+	if (R->blocked == 1 && duration_cast<seconds>(steady_clock::now() - R->removeBlockTimer).count() > 5)
+	{
+		R->removeBlock();
+	}
+	//L->player->property[role::HealthPoint] -= 1;
 
 	return;
 }
@@ -218,12 +224,34 @@ void GamingActivity::render()
 		std::wcout << L"勇者血量：" << L->player->property[role::HealthPoint] << std::endl;
 		std::wcout << L"魔王血量：" << R->player->property[role::HealthPoint] << std::endl;
 
-		POINT from{ windowSize::X / 2 - 100,windowSize::Y / 2 - 200 }, to{ windowSize::X / 2 + 100,windowSize::Y / 2 + 200 };
 
-		std::wstring text = std::format(L"勇者血量：{}\n魔王血量：{}", L->player->property[role::HealthPoint], R->player->property[role::HealthPoint]);
-		outtextxy((to.x - from.x - textwidth(text.c_str())) / 2 + from.x, (to.y - from.y - textheight(text.c_str())) / 2 + from.y, (LPCTSTR)text.c_str());
+
+		POINT from{ windowSize::X / 2 * 0.382,windowSize::Y / 2 * 0.382 }, to{ windowSize::X / 2 * 1.618,windowSize::Y / 2 * 1.618 };
+
+		IMAGE img;
+		loadimage(&img, L"./Resource/Background.jpg", 0, 0);
+		putimage(0, 0, &img);
+		fillrectangle(from.x, from.y, to.x, to.y);
+
+		std::wstring text = std::format(L"{}胜利", L->player->property[role::HealthPoint] > R->player->property[role::HealthPoint] ? L"勇者" : L"魔王");
+		std::wstring text2 = std::format(L"勇者血量：{}    魔王血量：{}", L->player->property[role::HealthPoint], R->player->property[role::HealthPoint]);
+
+		outtextxy((to.x - from.x - textwidth(text.c_str())) / 2 + from.x, (to.y - from.y - textheight(text.c_str())) / 2 + from.y - textheight(text2.c_str()), (LPCTSTR)text.c_str());
+		outtextxy((to.x - from.x - textwidth(text2.c_str())) / 2 + from.x, (to.y - from.y - textheight(text2.c_str())) / 2 + from.y, (LPCTSTR)text2.c_str());
+
 
 		button(457, 536, 457 + 110, 536 + 40, (wchar_t*)L"主菜单");
+		FlushBatchDraw();
+		while (true)
+		{
+			getmessage(&m, EX_MOUSE);
+			if (m.message == WM_LBUTTONDOWN && m.x >= 457 && m.x <= 457 + 110 && m.y >= 536 && m.y <= 536 + 40)
+			{
+				activityManager::setActivity(new MenuActivity);
+				exitActivity = 1;
+				return;
+			}
+		}
 		return;
 	}
 
@@ -330,47 +358,47 @@ wordProcess::wordProcess()
 {
 	//constructor
 	this->data = new word * [5]
-	{
-		//Subject
-		new word[2]
 		{
-			{L"勇者",2,word::Subject},
-			{L"魔王",2,word::Subject},
-		},
-
-		//Verb
+			//Subject
 			new word[2]
-		{
-			{L"使用",2,word::Verb},
-			//{L"进行",0,word::Verb},
-			//{L"释放",0,word::Verb},
-			{L"使出",2,word::Verb},
-		},
+			{
+				{L"勇者",2,word::Subject},
+				{L"魔王",2,word::Subject},
+			},
 
-		//Object
-			new word[2]
-		{
-			{L"食物",2,word::Item},
-			{L"药剂",2,word::Item},
-		},
+			//Verb
+				new word[2]
+			{
+				{L"使用",2,word::Verb},
+				//{L"进行",0,word::Verb},
+				//{L"释放",0,word::Verb},
+				{L"使出",2,word::Verb},
+			},
 
-		//Action
-			new word[2]
-		{
-			{L"攻击",2,word::Action},
-			{L"强力攻击",4,word::Action},
-			//{L"防御",2,word::Action},
-		},
+			//Object
+				new word[2]
+			{
+				{L"食物",2,word::Item},
+				{L"药剂",2,word::Item},
+			},
 
-		//Special
-			new word[4]
-		{
-			{L"清空文本框",5,word::Special},
-			{L"移除词块",4,word::Special},
-			{L"生成词块",4,word::Special},
-			{L"禁用棋盘",4,word::Special},
-		},
-	};
+			//Action
+				new word[2]
+			{
+				{L"攻击",2,word::Action},
+				{L"强力攻击",4,word::Action},
+				//{L"防御",2,word::Action},
+			},
+
+			//Special
+				new word[4]
+			{
+				{L"清空文本框",5,word::Special},
+				{L"移除词块",4,word::Special},
+				{L"生成词块",4,word::Special},
+				{L"禁用棋盘",4,word::Special},
+			},
+		};
 
 	this->size = new int [5] { 2, 2, 2, 2, 4 };
 
