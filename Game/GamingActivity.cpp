@@ -11,7 +11,7 @@ void GamingActivity::init()
 	L->setGrid({ 10,10 });
 	L->init();
 	L->player->label = L"ÓÂÕß";
-	L->player->setImg(L"./Resource/player.png");
+	L->player->setImg(L"./Resource/Soldier.png", L->gridBlankSize);
 	L->sentence->setLocation({ 40,windowSize::Y - 40 - 45 }, { 40 + 411,windowSize::Y - 40 });
 
 	R = new board;
@@ -19,7 +19,7 @@ void GamingActivity::init()
 	R->setGrid({ 10,10 });
 	R->init();
 	R->player->label = L"Ä§Íõ";
-	R->player->setImg(L"./Resource/player.png");
+	R->player->setImg(L"./Resource/Demon.png", R->gridBlankSize);
 	R->sentence->setLocation({ windowSize::X - 40 - 411,windowSize::Y - 40 - 45 }, { windowSize::X - 40,windowSize::Y - 40 });
 
 	wordProc = new wordProcess;
@@ -147,32 +147,32 @@ void GamingActivity::process()
 
 
 
-		case VK_UP:
+		case 'U':
 			//Right Role Move Up
 			this->R->setPlayerLocation({ this->R->playerLocation.x,this->R->playerLocation.y - 1 });
 			break;
-		case VK_LEFT:
+		case 'H':
 			//Right Role Move Left
 			this->R->setPlayerLocation({ this->R->playerLocation.x - 1,this->R->playerLocation.y });
 			break;
-		case VK_DOWN:
+		case 'J':
 			//Right Role Move Down
 			this->R->setPlayerLocation({ this->R->playerLocation.x,this->R->playerLocation.y + 1 });
 			break;
-		case VK_RIGHT:
+		case 'K':
 			//Right Role Move Right
 			this->R->setPlayerLocation({ this->R->playerLocation.x + 1,this->R->playerLocation.y });
 			break;
-		case 'B':
+		case 'L':
 			//Right Role get word
 			R->sentence->addWord(R->getWord(R->playerLocation));
 			R->delWord(R->playerLocation);
 			break;
-		case 'N':
+		case 'I':
 			//erase textBox
 			R->sentence->empty();
 			break;
-		case 'M':
+		case 'O':
 			//apply sentence
 			wordProc->applySentence(R, L);
 			break;
@@ -194,7 +194,7 @@ void GamingActivity::process()
 
 	//generate word
 	static auto generateTimer = steady_clock::now();
-	if (duration_cast<seconds>(steady_clock::now() - generateTimer).count() > 0.2)
+	if (duration_cast<milliseconds>(steady_clock::now() - generateTimer).count() > 200)
 	{
 		generateTimer = steady_clock::now();
 		wordProc->generateWord(L);
@@ -444,6 +444,13 @@ void wordProcess::generateWord(board* targetBoard)
 		}
 		if (count == 0)
 		{
+			if (targetType == word::Subject)
+			{
+				word* tmp = new word{ data[targetType][wordIndex] };
+				tmp->text = targetBoard->player->label;
+				targetBoard->addWord(tmp, headLocation);
+				break;
+			}
 			targetBoard->addWord(new word{ data[targetType][wordIndex] }, headLocation);
 			break;
 		}
@@ -746,9 +753,9 @@ void board::removeBlock()
 {
 	for (int i = 0; i < grid.x; i++)
 	{
-		for (int i = 0; i < grid.y; i++)
+		for (int j = 0; j < grid.y; j++)
 		{
-			BlockedGrid[i][i] = 0;
+			BlockedGrid[i][j] = 0;
 		}
 	}
 	blocked = 0;
@@ -811,7 +818,7 @@ void board::render() const
 
 	for (int i = 1; i <= this->player->property[role::HealthPoint]; i++)
 	{
-		putimage(to.x - 36 * i, ((windowSize::Y - 40 - 45) - to.y - 40) / 2 + to.y + 4, &img);
+		activity::drawPngAlpha(to.x - 36 * i, ((windowSize::Y - 40 - 45) - to.y - 40) / 2 + to.y + 4, &img);
 	}
 
 	return;
@@ -859,6 +866,6 @@ bool role::shiftProerty(roleProperty targetProperty, int shiftValue)
 
 void role::render()
 {
-	putimage(this->location.x, this->location.y, &this->img);
+	activity::drawPngAlpha(this->location.x, this->location.y, &this->img);
 	return;
 }
