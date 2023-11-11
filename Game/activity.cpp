@@ -159,7 +159,7 @@ void TextRuleIntroActivity::lifeCycle()
 
 	cleardevice();
 	IMAGE img3;
-	loadimage(&img3, L"./Resource/ÎÄ×Ö½éÉÜ.jpg", 0, 0);
+	loadimage(&img3, L"./Resource/WordIntro.png", 0, 0);
 	putimage(0, 0, &img3);
 	wchar_t arr1[] = L"Ö÷²Ëµ¥";
 

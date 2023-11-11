@@ -35,6 +35,9 @@
     <ClInclude Include="include.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="miniaudio.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc">
