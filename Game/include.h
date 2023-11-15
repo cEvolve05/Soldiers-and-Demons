@@ -322,9 +322,16 @@ public:
 	wordProcess();
 	~wordProcess();
 
-	void generateWord(board* targetBoard);
-	bool applySentence(board* from, board* to/*textBox* targetTextBox, role* from, role* to*/);
+	struct possibilityBlock
+	{
+		word word;
+		unsigned short int possibility;
+	};
 
+	void generateWord(board* targetBoard);
+	bool applySentence(board* from, board* to);
+
+	void DEBUGremoveBlock(board* target);
 private:
 
 	void useItem(word* item, board* from, board* to);
@@ -334,8 +341,11 @@ private:
 	void blockBoard(board* target);
 
 
-	word** data;
-	int* size;
+	std::vector<std::vector<possibilityBlock>> data;
+	std::vector<int> size; //auto generate
+
+	std::vector<double> typePossibility;
+	std::vector<std::vector<double>> wordPossibility; //auto
 };
 
 class GamingActivity final : public activity

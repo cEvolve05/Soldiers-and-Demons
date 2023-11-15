@@ -178,7 +178,12 @@ void GamingActivity::process()
 			break;
 
 
-
+		case 'C':
+			wordProc->DEBUGremoveBlock(L);
+			break;
+		case 'V':
+			wordProc->DEBUGremoveBlock(R);
+			break;
 		case VK_ESCAPE:
 			//Exit Game
 			activityManager::setActivity(new MenuActivity);
@@ -357,50 +362,100 @@ void word::render(POINT from, POINT to)
 wordProcess::wordProcess()
 {
 	//constructor
-	this->data = new word * [5]
+
+	//data
+	{
+		//Subject
+		this->data.push_back
+		({
+				{{L"勇者",2,word::Subject},1},
+				{{L"魔王",2,word::Subject},1},
+		});
+
+		//Verb
+		this->data.push_back
+		({
+				{{L"使用",2,word::Verb},1},
+				//{{L"进行",0,word::Verb},1},
+				//{{L"释放",0,word::Verb},1},
+				{{L"使出",2,word::Verb},2},
+		});
+
+		//Object
+		this->data.push_back
+		({
+				{{L"食物",2,word::Item},2},
+				{{L"药剂",2,word::Item},1},
+		});
+
+		//Action
+		this->data.push_back
+		({
+				{{L"攻击",2,word::Action},2},
+				{{L"强力攻击",4,word::Action},1},
+				//{{L"防御",2,word::Action},1},
+		});
+
+		//Special
+		this->data.push_back
+		({
+				{{L"清空文本框",5,word::Special},1},
+				{{L"移除词块",4,word::Special},1},
+				{{L"生成词块",4,word::Special},1},
+				{{L"禁用棋盘",4,word::Special},1},
+		});
+	}
+
+	//data size
+	{
+		this->size.reserve(word::wordType::COUNT);
+		for (int i = 0; i < word::wordType::COUNT; i++)
 		{
-			//Subject
-			new word[2]
-			{
-				{L"勇者",2,word::Subject},
-				{L"魔王",2,word::Subject},
-			},
+			this->size.push_back(data[i].size());
+		}
+	}
 
-			//Verb
-				new word[2]
-			{
-				{L"使用",2,word::Verb},
-				//{L"进行",0,word::Verb},
-				//{L"释放",0,word::Verb},
-				{L"使出",2,word::Verb},
-			},
+	//type possibility
+	{
+		int typePossibilityRatio[word::wordType::COUNT]{ 3,3,1,1,1 };
+		this->typePossibility.reserve(word::wordType::COUNT);
+		int typePossibilitySum = 0;
+		for (int i = 0; i < word::wordType::COUNT; i++)
+		{
+			typePossibilitySum += typePossibilityRatio[i];
+		}
+		for (int i = 0; i < word::wordType::COUNT; i++)
+		{
+			this->typePossibility.push_back(double(typePossibilityRatio[i]) / double(typePossibilitySum));
+		}
+	}
 
-			//Object
-				new word[2]
-			{
-				{L"食物",2,word::Item},
-				{L"药剂",2,word::Item},
-			},
+	//word possibility
+	{
+		//allocate
+		this->wordPossibility.reserve(word::wordType::COUNT);
+		for (int i = 0; i < word::wordType::COUNT; i++)
+		{
+			wordPossibility.push_back(std::vector<double>(size[i]));
+		}
 
-			//Action
-				new word[2]
+		int wordPossibilitySum[word::wordType::COUNT] = { 0 };
+		for (int i = 0; i < word::wordType::COUNT; i++)
+		{
+			for (int j = 0; j < size[i]; j++)
 			{
-				{L"攻击",2,word::Action},
-				{L"强力攻击",4,word::Action},
-				//{L"防御",2,word::Action},
-			},
-
-			//Special
-				new word[4]
+				wordPossibilitySum[i] += data[i][j].possibility;
+			}
+			std::cout << std::endl;
+		}
+		for (int i = 0; i < word::wordType::COUNT; i++)
+		{
+			for (int j = 0; j < size[i]; j++)
 			{
-				{L"清空文本框",5,word::Special},
-				{L"移除词块",4,word::Special},
-				{L"生成词块",4,word::Special},
-				{L"禁用棋盘",4,word::Special},
-			},
-		};
-
-	this->size = new int [5] { 2, 2, 2, 2, 4 };
+				wordPossibility[i][j]=double(data[i][j].possibility) / double(wordPossibilitySum[i]);
+			}
+		}
+	}
 
 	//for (int i = 0; i < 5; i++)
 	//{
@@ -412,23 +467,45 @@ wordProcess::wordProcess()
 wordProcess::~wordProcess()
 {
 	//destructor
-	for (int i = 0; i < 5; i++)
-	{
-		delete[] data[i];
-	}
-	delete[] data;
 }
 
 void wordProcess::generateWord(board* targetBoard)
 {
+	double random;
+
 	// word type
 	int targetType = rand() % 5;
+	random = double(rand()) / double(RAND_MAX);
+	for (int i = 0; i < word::wordType::COUNT; i++)
+	{
+		random -= typePossibility[i];
+		if (random < 0.0)
+		{
+			targetType = i;
+			break;
+		}
+	}
+
 	// word detail
 	int wordIndex = rand() % size[targetType];
+	random = double(rand()) / double(RAND_MAX);
+	for (int i = 0; i < size[targetType]; i++)
+	{
+		random -= wordPossibility[targetType][i];
+		if (random < 0.0)
+		{
+			wordIndex = i;
+			break;
+		}
+	}
 
 	// word location
 	board::wordBlock*** boardStatue = targetBoard->WordInBoard;
-	int wordSize = data[targetType][wordIndex].length;
+
+
+
+
+	int wordSize = data[targetType][wordIndex].word.length;
 	int count = 0;
 	POINT headLocation;
 	for (int i = 0; i < 5; i++)
@@ -446,12 +523,12 @@ void wordProcess::generateWord(board* targetBoard)
 		{
 			if (targetType == word::Subject)
 			{
-				word* tmp = new word{ data[targetType][wordIndex] };
+				word* tmp = new word{ data[targetType][wordIndex].word };
 				tmp->text = targetBoard->player->label;
 				targetBoard->addWord(tmp, headLocation);
 				break;
 			}
-			targetBoard->addWord(new word{ data[targetType][wordIndex] }, headLocation);
+			targetBoard->addWord(new word{ data[targetType][wordIndex].word }, headLocation);
 			break;
 		}
 	}
@@ -461,6 +538,12 @@ void wordProcess::generateWord(board* targetBoard)
 bool wordProcess::applySentence(board* from, board* to)
 {
 	std::vector<word*>& sentence = from->sentence->words;
+
+	if (sentence.size() != 3)
+	{
+		from->sentence->empty();
+		return false;
+	}
 
 	if (sentence[0]->text != from->player->label || sentence[1]->type != word::Verb)
 	{
@@ -546,6 +629,15 @@ void wordProcess::removeBlock(board* target)
 	for (int i = 0; i < cycleTime; i++)
 	{
 		target->delWord(target->wordVault[rand() % target->wordVault.size()]->headLocation);
+	}
+	return;
+}
+
+void wordProcess::DEBUGremoveBlock(board* target)
+{
+	for (int i = 0; i < target->wordVault.size(); i++)
+	{
+		target->delWord(target->wordVault[0]->headLocation);
 	}
 	return;
 }
