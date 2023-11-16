@@ -62,7 +62,6 @@ int main()
 	srand((unsigned int)time(NULL));
 	game SOD;
 	SOD.entry();
-	getchar();
 
 	ma_device_uninit(&device);
 	ma_decoder_uninit(&decoder);

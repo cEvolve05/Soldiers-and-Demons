@@ -133,8 +133,11 @@ void GamingActivity::process()
 			break;
 		case 'F':
 			//Left Role get word
-			L->sentence->addWord(L->getWord(L->playerLocation));
-			L->delWord(L->playerLocation);
+			if (bool(L->getWord(L->playerLocation)))
+			{
+				L->sentence->addWord(L->getWord(L->playerLocation));
+				L->delWord(L->playerLocation);
+			}
 			break;
 		case 'E':
 			//erase textBox
@@ -165,8 +168,11 @@ void GamingActivity::process()
 			break;
 		case 'L':
 			//Right Role get word
-			R->sentence->addWord(R->getWord(R->playerLocation));
-			R->delWord(R->playerLocation);
+			if (bool(R->getWord(R->playerLocation)))
+			{
+				R->sentence->addWord(R->getWord(R->playerLocation));
+				R->delWord(R->playerLocation);
+			}
 			break;
 		case 'I':
 			//erase textBox
@@ -319,6 +325,7 @@ void textBox::render()
 {
 	//clearrectangle(from.x, from.y, to.x, to.y);
 	fillrectangle(from.x, from.y, to.x, to.y);
+	setcliprgn(CreateRectRgn(from.x, from.y, to.x, to.y));
 
 	int y1 = from.y + 2, y2 = to.y - 2, x1 = from.x + 2;
 	settextstyle(y2 - y1 - 4, 0, L"ºÚÌå");
@@ -328,6 +335,8 @@ void textBox::render()
 		outtextxy(x1 + 2, y1 + 2, (LPCTSTR)(*iter)->text.c_str());
 		x1 = x1 + textwidth((*iter)->text.c_str()) + 2 + 2;
 	}
+
+	setcliprgn(NULL);
 	return;
 }
 
@@ -452,7 +461,7 @@ wordProcess::wordProcess()
 		{
 			for (int j = 0; j < size[i]; j++)
 			{
-				wordPossibility[i][j]=double(data[i][j].possibility) / double(wordPossibilitySum[i]);
+				wordPossibility[i][j] = double(data[i][j].possibility) / double(wordPossibilitySum[i]);
 			}
 		}
 	}
@@ -819,7 +828,11 @@ bool board::addWord(word* word, POINT wordHeadLocation)
 
 word* board::getWord(POINT location)
 {
-	return WordInBoard[location.x][location.y]->word;
+	if (bool(WordInBoard[location.x][location.y]))
+	{
+		return WordInBoard[location.x][location.y]->word;
+	}
+	return NULL;
 }
 
 void board::delWord(POINT location)
