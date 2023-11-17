@@ -309,6 +309,10 @@ void textBox::addWord(word* INword)
 void textBox::empty()
 {
 	//empty the word list
+	for (int i = 0; i < words.size(); i++)
+	{
+		delete words[i];
+	}
 	this->words.clear();
 	return;
 }
@@ -357,7 +361,7 @@ word::word(std::wstring text, int length, wordType type)
 	this->type = type;
 }
 
-void word::render(POINT from, POINT to)
+void word::render(POINT from, POINT to) const
 {
 	fillrectangle(from.x, from.y, to.x, to.y);
 	settextstyle(to.y - from.y - 4, 0, L"ºÚÌå");
@@ -393,25 +397,25 @@ wordProcess::wordProcess()
 		//Object
 		this->data.push_back
 		({
-				{{L"Ê³Îï",2,word::Item},2},
-				{{L"Ò©¼Á",2,word::Item},1},
+				{{L"Ê³Îï",2,word::Item},5},
+				{{L"Ò©¼Á",2,word::Item},3},
 		});
 
 		//Action
 		this->data.push_back
 		({
-				{{L"¹¥»÷",2,word::Action},2},
-				{{L"Ç¿Á¦¹¥»÷",4,word::Action},1},
+				{{L"¹¥»÷",2,word::Action},3},
+				{{L"Ç¿Á¦¹¥»÷",4,word::Action},2},
 				//{{L"·ÀÓù",2,word::Action},1},
 		});
 
 		//Special
 		this->data.push_back
 		({
-				{{L"Çå¿ÕÎÄ±¾¿ò",5,word::Special},1},
+				{{L"Çå¿ÕÎÄ±¾¿ò",5,word::Special},2},
 				{{L"ÒÆ³ý´Ê¿é",4,word::Special},1},
 				{{L"Éú³É´Ê¿é",4,word::Special},1},
-				{{L"½ûÓÃÆåÅÌ",4,word::Special},1},
+				{{L"½ûÓÃÆåÅÌ",4,word::Special},2},
 		});
 	}
 
@@ -426,7 +430,7 @@ wordProcess::wordProcess()
 
 	//type possibility
 	{
-		int typePossibilityRatio[word::wordType::COUNT]{ 3,3,1,1,1 };
+		int typePossibilityRatio[word::wordType::COUNT]{ 2,2,2,2,3 };
 		this->typePossibility.reserve(word::wordType::COUNT);
 		int typePossibilitySum = 0;
 		for (int i = 0; i < word::wordType::COUNT; i++)
@@ -478,6 +482,8 @@ wordProcess::~wordProcess()
 	//destructor
 }
 
+int logcat[10][10] = {};
+
 void wordProcess::generateWord(board* targetBoard)
 {
 	double random;
@@ -508,12 +514,9 @@ void wordProcess::generateWord(board* targetBoard)
 		}
 	}
 
-	// word location
 	board::wordBlock*** boardStatue = targetBoard->WordInBoard;
 
-
-
-
+	// word location
 	int wordSize = data[targetType][wordIndex].word.length;
 	int count = 0;
 	POINT headLocation;
@@ -530,6 +533,7 @@ void wordProcess::generateWord(board* targetBoard)
 		}
 		if (count == 0)
 		{
+			logcat[targetType][wordIndex] += 1;
 			if (targetType == word::Subject)
 			{
 				word* tmp = new word{ data[targetType][wordIndex].word };
@@ -693,6 +697,7 @@ board::board()
 	this->playerLocation = { 0 };
 	this->sentence = new textBox;
 	this->BlockedGrid = { 0 };
+	loadimage(&this->HP, L"./Resource/HP.png");
 }
 
 board::~board()
@@ -916,14 +921,12 @@ void board::render() const
 	this->player->render();
 
 	//HP render
-	IMAGE img;
-	loadimage(&img, L"./Resource/HP.png", 0, 0);
 	fillrectangle(from.x, ((windowSize::Y - 40 - 45) - to.y - 40) / 2 + to.y,
 		to.x, ((windowSize::Y - 40 - 45) - to.y - 40) / 2 + to.y + 40);
 
 	for (int i = 1; i <= this->player->property[role::HealthPoint]; i++)
 	{
-		activity::drawPngAlpha(to.x - 36 * i, ((windowSize::Y - 40 - 45) - to.y - 40) / 2 + to.y + 4, &img);
+		activity::drawPngAlpha(to.x - 36 * i, ((windowSize::Y - 40 - 45) - to.y - 40) / 2 + to.y + 4, (IMAGE*) & HP);
 	}
 
 	return;

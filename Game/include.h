@@ -198,7 +198,7 @@ public:
 	};
 
 	word(std::wstring text, int length = 0, wordType type = COUNT);
-	void render(POINT from, POINT to);
+	void render(POINT from, POINT to) const;
 
 	std::wstring text;
 	int length;
@@ -297,6 +297,7 @@ public:
 
 	void render() const;
 private:
+	IMAGE HP;
 	struct wordBlock
 	{
 		word* word;
