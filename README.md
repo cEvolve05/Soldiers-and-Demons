@@ -1,2 +1,10 @@
-# Soldiers-and-Demons
-博弈游戏
+# 魔王和勇者 Soldiers-and-Demons
+
+博弈主题游戏开发竞赛作品，尝试思考新的玩家与文本交互的方式
+
+灵感来自：文字游戏 等
+
+## 编译
+
+1. 安装 EasyX
+2. 使用 VS 编译
