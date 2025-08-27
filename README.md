@@ -6,5 +6,8 @@
 
 ## 编译
 
+要求：Windows、MSVC
+
 1. 安装 EasyX
-2. 使用 VS 编译
+2. 使用 `Native - MSVC x64` 配置 CMake 并编译
+3. 将项目根目录作为cwd运行

@@ -397,6 +397,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-# Obsidian
-*/.obsidian
-/Document/游戏程序设计过程.md
+build
+.vscode
